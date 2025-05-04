@@ -1,0 +1,33 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+.mypy_cache
+
+# Ignore Gradle build output directory
+build
+
+.vscode
+
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+.classpath
+.project
+TODO.txt
+lib/
+litresbot.properties
+*.log
+*.lck
+/flibooks/
+litresbot.jar
+commit.bat
+run.bat
+download/
