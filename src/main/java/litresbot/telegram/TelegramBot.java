@@ -13,15 +13,21 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.AppProperties;
+import litresbot.telegram.commands.TelegramBotCommands;
 
 public class TelegramBot extends TelegramLongPollingBot {
     final static Logger logger = LogManager.getLogger(TelegramBot.class);
+    protected TelegramBotCommands telegramBotCommands;
 
     public TelegramBot(DefaultBotOptions options, String botToken) {
         super(options, botToken);
     }
 
-    protected static String getChatId(Update update) throws TelegramApiException {
+    public void registerCommands(TelegramBotCommands telegramBotCommands) {
+        this.telegramBotCommands = telegramBotCommands;
+    }
+
+    public static Long getChatId(Update update) throws TelegramApiException {
         var chatMessage = update.getMessage();
 
         if (update.hasCallbackQuery()) {
@@ -34,24 +40,22 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (chatMessage == null) {
             throw new TelegramApiException("Chat message is unavailable.");
         }
-        return String.valueOf(chatMessage.getChatId());
+        return chatMessage.getChatId();
     }
 
-    public void sendReply(Update update, String res) throws TelegramApiException {
+    public void sendReply(Long chatId, String res) throws TelegramApiException {
         final var message = new SendMessage();
         message.setText(res);
         message.enableHtml(true);
-        sendReply(update, message);
+        sendReply(chatId, message);
     }
 
-    public void sendReply(Update update, SendMessage res) throws TelegramApiException {
-        final var chatId = getChatId(update);
+    public void sendReply(Long chatId, SendMessage res) throws TelegramApiException {
         res.setChatId(chatId);
         execute(res);
     }
 
-    public void sendReply(Update update, SendMessageList res) throws TelegramApiException {
-        final var chatId = getChatId(update);
+    public void sendReply(Long chatId, SendMessageList res) throws TelegramApiException {
         for (final var sm : res.getMessages()) {
             if (sm.getText() != null && sm.getText().length() > 0) {
                 sm.setChatId(chatId);
@@ -60,17 +64,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendFile(Update update, SendDocument res) throws TelegramApiException {
-        final var chatId = getChatId(update);
+    public void sendFile(Long chatId, SendDocument res) throws TelegramApiException {
         res.setChatId(chatId);
         execute(res);
     }
 
-    public void sendBusy(Update update) throws TelegramApiException {
-        final var chatId = getChatId(update);
+    public void sendBusy(Long chatId) throws TelegramApiException {
         final var sca = new SendChatAction();
         sca.setChatId(chatId);
-        sca.setAction(ActionType.UPLOADDOCUMENT);
+        sca.setAction(ActionType.TYPING);
         execute(sca);
     }
 
@@ -82,8 +84,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        // TODO: create new thread when processing the update
         try {
-            TelegramBotCommands.commandReceived(this, update);
+            telegramBotCommands.commandReceived(update);
         } catch (TelegramApiException e) {
             logger.error("Error processing telegram command: " + e.getMessage(), e);
         }

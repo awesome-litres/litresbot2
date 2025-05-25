@@ -3,12 +3,10 @@ package litresbot.books.convert;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Stack;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import litresbot.books.FictionBook;
 import litresbot.books.convert.TagPosition.TagType;
@@ -16,34 +14,19 @@ import litresbot.books.convert.TagPosition.TagType;
 public class Fb2Converter {
     public final static String PARAGRAPH_INDENT = "    ";
 
-    public static List<String> convertToText(FictionBook book, int pageSize) throws IOException {
-        List<String> pages = new ArrayList<String>();
-        NodeList fb2BodyList = book.xmlDocument.getElementsByTagName("body");
-        if (fb2BodyList.getLength() == 0)
-            return pages;
-
-        Node fb2Body = fb2BodyList.item(0);
-        if (fb2Body.getNodeType() != Node.ELEMENT_NODE)
-            return pages;
-
-        TextParagraphPrinter printer = new TextParagraphPrinter();
-        printer.pageSize = pageSize;
-        printer.indent = PARAGRAPH_INDENT;
-        printBody((Element) fb2Body, printer, pages);
-        return pages;
-    }
-
     public static List<String> convertToTelegram(FictionBook book, int pageSize) throws IOException {
-        List<String> pages = new ArrayList<String>();
-        NodeList fb2BodyList = book.xmlDocument.getElementsByTagName("body");
-        if (fb2BodyList.getLength() == 0)
+        final var pages = new ArrayList<String>();
+        final var fb2BodyList = book.asDocument().getElementsByTagName("body");
+        if (fb2BodyList.getLength() == 0) {
             return pages;
+        }
 
-        Node fb2Body = fb2BodyList.item(0);
-        if (fb2Body.getNodeType() != Node.ELEMENT_NODE)
+        final var fb2Body = fb2BodyList.item(0);
+        if (fb2Body.getNodeType() != Node.ELEMENT_NODE) {
             return pages;
+        }
 
-        TextParagraphPrinter printer = new TelegramParagraphPrinter();
+        final var printer = new TelegramParagraphPrinter();
         printer.pageSize = pageSize;
         printer.indent = PARAGRAPH_INDENT;
         printBody((Element) fb2Body, printer, pages);
@@ -51,21 +34,22 @@ public class Fb2Converter {
     }
 
     private static void printBody(Element body, TextParagraphPrinter printer, List<String> pages) throws IOException {
-        NodeList sections = body.getElementsByTagName("section");
+        final var sections = body.getElementsByTagName("section");
 
         // add first title of the body and finish search
-        NodeListIterator titlesIterator = new NodeListIterator(body);
-        for (Node n : titlesIterator.getIterable()) {
-            if (n.getNodeName() != "title")
+        final var titlesIterator = new NodeListIterator(body);
+        for (final var n : titlesIterator.getIterable()) {
+            if (n.getNodeName() != "title") {
                 continue;
+            }
             printSection(n, printer, pages);
             break;
         }
 
         // add all sections of the body (including childrens' children) to the
         // sectionNodes
-        NodeListIterator sectionsIterator = new NodeListIterator(sections);
-        for (Node n : sectionsIterator.getIterable()) {
+        final var sectionsIterator = new NodeListIterator(sections);
+        for (final var n : sectionsIterator.getIterable()) {
             printSection(n, printer, pages);
         }
 
@@ -74,15 +58,16 @@ public class Fb2Converter {
 
     private static void printSection(Node section, TextParagraphPrinter printer, List<String> pages)
             throws IOException {
-        NodeListIterator sectionChildrenIterator = new NodeListIterator(section);
+        final var sectionChildrenIterator = new NodeListIterator(section);
 
-        for (Node c : sectionChildrenIterator.getIterable()) {
+        for (final var c : sectionChildrenIterator.getIterable()) {
             if (c.getNodeName() == "title") {
                 // process title paragraphs
-                NodeListIterator titleChildrenIterator = new NodeListIterator(c);
-                for (Node t : titleChildrenIterator.getIterable()) {
-                    if (t.getNodeName() != "p")
+                final var titleChildrenIterator = new NodeListIterator(c);
+                for (final var t : titleChildrenIterator.getIterable()) {
+                    if (t.getNodeName() != "p") {
                         continue;
+                    }
                     printParagraphTree(t, printer, pages, true);
                 }
                 continue;
@@ -95,32 +80,32 @@ public class Fb2Converter {
 
     private static void printParagraphTree(Node node, TextParagraphPrinter printer, List<String> pages,
             boolean fromTitle) throws IOException {
-        Stack<ParagraphNode> stk = new Stack<ParagraphNode>();
-        ParagraphNode topParagraph = new ParagraphNode();
+        var stk = new Stack<ParagraphNode>();
+        final var topParagraph = new ParagraphNode();
         topParagraph.node = node;
         topParagraph.text = node.getTextContent();
         stk.push(topParagraph);
 
         while (!stk.isEmpty()) {
-            ParagraphNode top = stk.pop();
+            final var top = stk.pop();
 
             if (top.node == null) {
                 printer.printParagraph(top, pages, fromTitle);
                 continue;
             }
 
-            NodeListIterator paragraphsIterator = new NodeListIterator(top.node);
-            List<ParagraphNode> children = new ArrayList<ParagraphNode>();
+            final var paragraphsIterator = new NodeListIterator(top.node);
+            final var children = new ArrayList<ParagraphNode>();
             ParagraphNode currentParagraph = null;
 
-            for (Node p : paragraphsIterator.getIterable()) {
+            for (final var p : paragraphsIterator.getIterable()) {
                 if (p.getNodeName() == "p") {
                     if (currentParagraph != null) {
                         children.add(currentParagraph);
                         currentParagraph = null;
                     }
 
-                    ParagraphNode childParagraph = new ParagraphNode();
+                    final var childParagraph = new ParagraphNode();
                     childParagraph.node = p;
                     childParagraph.text = p.getTextContent();
                     children.add(childParagraph);
@@ -132,7 +117,7 @@ public class Fb2Converter {
                     currentParagraph.text = "";
                 }
                 if (p.getNodeName() == "strong") {
-                    TagPosition tag = new TagPosition();
+                    final var tag = new TagPosition();
                     tag.from = currentParagraph.text.length();
                     tag.to = currentParagraph.text.length() + p.getTextContent().length();
                     tag.type = TagType.BOLD;
@@ -141,7 +126,7 @@ public class Fb2Converter {
                     continue;
                 }
                 if (p.getNodeName() == "emphasis") {
-                    TagPosition tag = new TagPosition();
+                    final var tag = new TagPosition();
                     tag.from = currentParagraph.text.length();
                     tag.to = currentParagraph.text.length() + p.getTextContent().length();
                     tag.type = TagType.ITALIC;
@@ -150,7 +135,7 @@ public class Fb2Converter {
                     continue;
                 }
                 if (p.getNodeName() == "strikethrough") {
-                    TagPosition tag = new TagPosition();
+                    final var tag = new TagPosition();
                     tag.from = currentParagraph.text.length();
                     tag.to = currentParagraph.text.length() + p.getTextContent().length();
                     tag.type = TagType.STRIKE;
@@ -169,9 +154,9 @@ public class Fb2Converter {
                 children.add(currentParagraph);
             }
 
-            ListIterator<ParagraphNode> iterator = children.listIterator(children.size());
+            final var iterator = children.listIterator(children.size());
             while (iterator.hasPrevious()) {
-                ParagraphNode p = iterator.previous();
+                final var p = iterator.previous();
                 stk.push(p);
             }
         }

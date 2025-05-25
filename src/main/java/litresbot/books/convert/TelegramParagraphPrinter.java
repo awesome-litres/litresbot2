@@ -11,8 +11,9 @@ class TelegramParagraphPrinter extends TextParagraphPrinter {
 
     // add unfinished page to the pages list
     public void flush(List<String> pages) {
-        if (printedSize == 0)
+        if (printedSize == 0) {
             return;
+        }
         pages.add(currentPage.toString());
         currentPage = new StringBuilder();
         printedSize = 0;
@@ -31,9 +32,9 @@ class TelegramParagraphPrinter extends TextParagraphPrinter {
                 flush(pages);
             }
 
-            int pageSizeLeft = pageSize - printedSize;
+            final var pageSizeLeft = pageSize - printedSize;
 
-            int paragraphSizeToWrite = paragraph.text.length() - currentPosition;
+            var paragraphSizeToWrite = paragraph.text.length() - currentPosition;
             if (paragraphSizeToWrite <= 0)
                 break;
 
@@ -42,9 +43,9 @@ class TelegramParagraphPrinter extends TextParagraphPrinter {
             }
 
             // now start truncating paragraph.text
-            String truncParagraphPage = "";
+            var truncParagraphPage = "";
             for (int i = currentPosition; i < paragraph.text.length(); i++) {
-                char letter = paragraph.text.charAt(i);
+                final var letter = paragraph.text.charAt(i);
                 if (letter == ' ') {
                     if (truncParagraphPage.isEmpty()) {
                         initialSpaces++;
@@ -60,18 +61,18 @@ class TelegramParagraphPrinter extends TextParagraphPrinter {
                 }
             }
 
-            List<TagPosition> shiftedTags = new ArrayList<>();
+            final var shiftedTags = new ArrayList<TagPosition>();
 
-            for (TagPosition t : paragraph.tags) {
+            for (final var t : paragraph.tags) {
                 if (t.from < (currentPosition + initialSpaces))
                     continue;
-                TagPosition newTag = new TagPosition();
+                final var newTag = new TagPosition();
                 newTag.from = t.from - currentPosition - initialSpaces;
                 newTag.to = t.to - currentPosition - initialSpaces;
                 newTag.type = t.type;
                 shiftedTags.add(newTag);
             }
-            String withTags = TagsInserter.insertTags(truncParagraphPage, shiftedTags);
+            var withTags = TagsInserter.insertTags(truncParagraphPage, shiftedTags);
 
             if (paragraphStart) {
                 withTags = "\n" + Fb2Converter.PARAGRAPH_INDENT + withTags;

@@ -1,12 +1,8 @@
 package litresbot.telegram;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 public class TelegramFilterHtml {
     // Telegram supported tags
@@ -16,14 +12,14 @@ public class TelegramFilterHtml {
     // <s>strikethrough</s>, <strike>strikethrough</strike>,
     // <del>strikethrough</del>
     public static String filterText(String text) {
-        Document doc = Jsoup.parseBodyFragment(text);
-        Elements divElements = doc.select("a, b, strong, i, em, u, ins, s, strike, del, br, :matchText");
+        final var doc = Jsoup.parseBodyFragment(text);
+        final var divElements = doc.select("a, b, strong, i, em, u, ins, s, strike, del, br, :matchText");
         String[] formatElements = { "a", "b", "strong", "i", "em", "u", "ins", "s", "strike", "del" };
-        List<String> texts = new ArrayList<>(divElements.size());
-        for (Element el : divElements) {
+        final var texts = new ArrayList<String>(divElements.size());
+        for (final var el : divElements) {
             // add newline in the end of <p>
             if (el.tagName().equalsIgnoreCase("p")) {
-                String pText = el.wholeText();
+                var pText = el.wholeText();
                 if (el.parent() != null && (el.siblingIndex() + 1 >= el.parent().childNodeSize())) {
                     pText += "\n";
                 }
@@ -35,8 +31,8 @@ public class TelegramFilterHtml {
                 texts.add("\n");
                 continue;
             }
-            boolean gotFormat = false;
-            for (String f : formatElements) {
+            var gotFormat = false;
+            for (final var f : formatElements) {
                 if (el.tagName().equalsIgnoreCase(f)) {
                     texts.add(el.outerHtml());
                     gotFormat = true;
@@ -50,8 +46,6 @@ public class TelegramFilterHtml {
                 texts.add(el.wholeText());
             }
         }
-
-        String result = String.join("", texts);
-        return result;
+        return String.join("", texts);
     }
 }

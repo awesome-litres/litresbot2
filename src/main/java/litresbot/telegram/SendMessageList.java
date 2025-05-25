@@ -22,6 +22,13 @@ public class SendMessageList {
         this.max = max;
     }
 
+    public static SendMessageList fromText(String text) {
+        final var message = new SendMessageList();
+        message.appendTextPage(text);
+        message.endTextPage();
+        return message;
+    }
+
     public void endTextPage() {
         if ((currentTextChunk.length() + scratchpadPage.length()) > max) {
             pages.add(scratchpadPage);

@@ -15,9 +15,7 @@ public final class Plurals {
             return PluralForm.FIVE;
         n = Math.abs(n) % 100;
         int n1 = n % 10;
-        if (n == 11)
-            return PluralForm.ONE;
-        if (n > 11 && n < 20)
+        if (n >= 11 && n <= 20)
             return PluralForm.FIVE;
         if (n1 > 1 && n1 < 5)
             return PluralForm.TWO;

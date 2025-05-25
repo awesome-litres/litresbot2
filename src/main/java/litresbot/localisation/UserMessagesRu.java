@@ -3,46 +3,40 @@ package litresbot.localisation;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserMessagesRu implements UserMessages
-{
-  public Map<String, String> translation = createMap();
+public class UserMessagesRu implements UserMessages {
+    public final static Map<String, String> translation = new HashMap<String, String>();
+    {
+        translation.put(UserMessagesEn.welcomeScreen, "Введите название книги для поиска.");
+        translation.put(UserMessagesEn.helpCommands, "Список доступных команд:");
+        translation.put(UserMessagesEn.helpStart, "начало работы с ботом");
+        translation.put(UserMessagesEn.helpHelp, "справка по работе с ботом");
+        translation.put(UserMessagesEn.helpBook, "поиск по названию книги");
+        translation.put(UserMessagesEn.errorUnknown, "Неизвестная ошибка");
+        translation.put(UserMessagesEn.errorWrongBookId, "Неверный ID книги");
+        translation.put(UserMessagesEn.errorCouldNotDownloadFile, "Не получилось загрузить файл");
+        translation.put(UserMessagesEn.errorBadCommand, "Неверная команда");
+        translation.put(UserMessagesEn.errorSearchNotFound, "Ничего не найдено");
+        translation.put(UserMessagesEn.searchInProgress, "Поиск книги...");
+        translation.put(UserMessagesEn.searchFoundTotal, "Найдено: ");
+        translation.put(UserMessagesEn.bookText, "книга");
+        translation.put(UserMessagesEn.searchGoto, "Загрузить: ");
+        translation.put(UserMessagesEn.searchDownload, "Загрузить");
+        translation.put(UserMessagesEn.downloadInProgress, "Загружаю книгу...");
+        translation.put(UserMessagesEn.downloadFinished, "Книга загружена");
+        translation.put(UserMessagesEn.searchRead, "Читать");
+        translation.put(UserMessagesEn.previousText, "Назад");
+        translation.put(UserMessagesEn.nextText, "Дальше");
+        translation.put(UserMessagesEn.beginText, "Начало");
+        translation.put(UserMessagesEn.endText, "Конец");
+        translation.put(UserMessagesEn.annotationEmpty, "Нет аннотации");
+        translation.put(UserMessagesEn.pageNumberText, "Страница: ");
+    }
 
-  private static Map<String, String> createMap() {
-    Map<String, String> map = new HashMap<String, String>();
-    map.put(UserMessagesEn.welcomeScreen, "Введите название книги для поиска.");
-    map.put(UserMessagesEn.helpCommands, "Список доступных команд:");
-    map.put(UserMessagesEn.helpStart, "начало работы с ботом");
-    map.put(UserMessagesEn.helpHelp, "справка по работе с ботом");
-    map.put(UserMessagesEn.helpBook, "поиск по названию книги");
-    map.put(UserMessagesEn.errorUnknown, "Неизвестная ошибка");
-    map.put(UserMessagesEn.errorWrongBookId, "Неверный ID книги");
-    map.put(UserMessagesEn.errorCouldNotDownloadFile, "Не получилось загрузить файл");
-    map.put(UserMessagesEn.errorBadCommand, "Неверная команда");
-    map.put(UserMessagesEn.errorSearchNotFound, "Ничего не найдено");
-    map.put(UserMessagesEn.searchInProgress, "Поиск книги...");
-    map.put(UserMessagesEn.searchFoundTotal, "Найдено: ");
-    map.put(UserMessagesEn.bookText, "книга");
-    map.put(UserMessagesEn.searchGoto, "Загрузить: ");
-    map.put(UserMessagesEn.searchDownload, "Загрузить");
-    map.put(UserMessagesEn.downloadInProgress, "Загружаю книгу...");
-    map.put(UserMessagesEn.downloadFinished, "Книга загружена");
-    map.put(UserMessagesEn.searchRead, "Читать");
-    map.put(UserMessagesEn.previousText, "Назад");
-    map.put(UserMessagesEn.nextText, "Дальше");
-    map.put(UserMessagesEn.beginText, "Начало");
-    map.put(UserMessagesEn.endText, "Конец");
-    map.put(UserMessagesEn.annotationEmpty, "Нет аннотации");
-    map.put(UserMessagesEn.pageNumberText, "Страница: ");
-    return map;
-  }
-  
-  public String language()
-  {
-    return "ru";
-  }
-  
-  public String get(String in)
-  {
-    return translation.get(in);
-  }
+    public String language() {
+        return "ru";
+    }
+
+    public String get(String in) {
+        return translation.get(in);
+    }
 }

@@ -18,8 +18,8 @@ class TextParagraphPrinter {
     }
 
     public void printParagraph(ParagraphNode paragraph, List<String> pages, boolean fromTitle) throws IOException {
-        String paragraphText = "\n" + Fb2Converter.PARAGRAPH_INDENT + paragraph.text;
-        int paragraphSize = paragraphText.length();
+        final var paragraphText = "\n" + Fb2Converter.PARAGRAPH_INDENT + paragraph.text;
+        final var paragraphSize = paragraphText.length();
         int currentPosition = 0;
 
         while (true) {
@@ -27,11 +27,11 @@ class TextParagraphPrinter {
                 flush(pages);
             }
 
-            int paragraphSizeToWrite = paragraphSize - currentPosition;
+            var paragraphSizeToWrite = paragraphSize - currentPosition;
             if (paragraphSizeToWrite <= 0)
                 break;
 
-            int pageSizeLeft = pageSize - currentPage.length();
+            final var pageSizeLeft = pageSize - currentPage.length();
 
             if (paragraphSizeToWrite > pageSizeLeft) {
                 paragraphSizeToWrite = pageSizeLeft;

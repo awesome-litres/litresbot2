@@ -10,6 +10,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import litresbot.localisation.UserMessages;
 import litresbot.localisation.UserMessagesRu;
 import litresbot.telegram.TelegramBot;
+import litresbot.telegram.commands.TelegramBotCommands;
 
 public class Application {
     public static final String packageName = Application.class.getPackage().getName();
@@ -22,27 +23,27 @@ public class Application {
     final static Logger logger = LogManager.getLogger(Application.class);
 
     public static void main(String[] args) {
-        String version = AppProperties.versionProperties.getProperty("version");
+        final var version = AppProperties.versionProperties.getProperty("version");
         logger.info(packageName + " " + ((version == null) ? "(no version)" : version));
 
         terminated = false;
 
-        DefaultBotOptions botOptions = new DefaultBotOptions();
-        String botToken = AppProperties.getStringProperty("botToken");
+        final var botOptions = new DefaultBotOptions();
+        final var botToken = AppProperties.getStringProperty("botToken");
         if (botToken == null) {
             logger.error("botToken is not defined. Unable to register bot.");
             return;
         }
 
-        Boolean useProxy = AppProperties.getBooleanProperty("useProxy");
+        var useProxy = AppProperties.getBooleanProperty("useProxy");
         if (useProxy == null) {
             useProxy = false;
         }
 
         if (useProxy) {
-            String host = AppProperties.getStringProperty("proxyHost");
-            Integer port = AppProperties.getIntProperty("proxyPort");
-            String proxyType = AppProperties.getStringProperty("proxyType");
+            final var host = AppProperties.getStringProperty("proxyHost");
+            final var port = AppProperties.getIntProperty("proxyPort");
+            final var proxyType = AppProperties.getStringProperty("proxyType");
 
             if (host == null) {
                 logger.error("proxyHost is not defined. Define it to proxy host or switch off the proxy.");
@@ -73,15 +74,17 @@ public class Application {
             }
         }
 
-        String flibustaDownloadPath = AppProperties.getStringProperty("flibustaDownloadPath");
+        var flibustaDownloadPath = AppProperties.getStringProperty("flibustaDownloadPath");
         if (flibustaDownloadPath == null) {
             flibustaDownloadPath = "./tmp";
         }
 
         try {
             final var telegram = new TelegramBotsApi(DefaultBotSession.class);
-            telegram.registerBot(new TelegramBot(botOptions, botToken));
-            logger.info("Bot registered OK");
+            final var bot = new TelegramBot(botOptions, botToken);
+            bot.registerCommands(new TelegramBotCommands(bot));
+            telegram.registerBot(bot);
+            logger.info("Bot successfully registered");
         } catch (TelegramApiException e) {
             logger.error("Could not register a bot", e);
             return;
@@ -89,8 +92,9 @@ public class Application {
 
         try {
             while (true) {
-                if (terminated)
+                if (terminated) {
                     break;
+                }
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {

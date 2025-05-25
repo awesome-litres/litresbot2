@@ -11,8 +11,4 @@ class TagPosition {
     public int from;
     public int to;
     public TagType type;
-
-    public int getFrom() {
-        return from;
-    }
 }

@@ -1,0 +1,51 @@
+package litresbot.telegram.commands;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import litresbot.books.BookInfo;
+import litresbot.telegram.TelegramBot;
+import litresbot.telegram.view.TelegramView;
+
+public class BookSearchNextCommand implements TelegramCommandInterface {
+    public static final String command = "/next";
+    protected final TelegramBot bot;
+
+    BookSearchNextCommand(TelegramBot bot) {
+        this.bot = bot;
+    }
+
+    @Override
+    public Boolean isCommand(String cmd) {
+        return cmd.startsWith(command);
+    }
+
+    @Override
+    public void execute(Long chatId, Message message) throws TelegramApiException {
+        final var cmd = message.getText().toLowerCase();
+        // take the rest of the command as an argument since it may contain spaces
+        final var argument = cmd.substring(command.length() + 1);
+        final var fromBook = Integer.parseInt(argument);
+        bookSearchNext(chatId, fromBook);
+    }
+
+    protected void bookSearchNext(Long chatId, int fromBook) throws TelegramApiException {
+        // TODO: get books from the user session state
+        List<BookInfo> books = new ArrayList<>();
+        var nextPage = "/";
+        var booksSearchTo = books.size();
+        if (booksSearchTo > fromBook + BookSearchCommand.searchPageSize) {
+            booksSearchTo = fromBook + BookSearchCommand.searchPageSize;
+            nextPage = "/next " + booksSearchTo;
+        }
+        if (booksSearchTo < fromBook) {
+            booksSearchTo = fromBook;
+        }
+        
+        final var reply = TelegramView.bookSearchResult(books, fromBook, booksSearchTo, nextPage);
+        bot.sendReply(chatId, reply);
+    }
+}

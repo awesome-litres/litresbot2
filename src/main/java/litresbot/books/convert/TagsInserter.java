@@ -1,23 +1,22 @@
 package litresbot.books.convert;
 
-import java.util.Comparator;
 import java.util.List;
 
 import litresbot.books.convert.TagPosition.TagType;
 
 public class TagsInserter {
     public static String insertTags(String text, List<TagPosition> tagPositions) {
-        tagPositions.sort(Comparator.comparing(TagPosition::getFrom));
+        tagPositions.sort((t1, t2) -> t1.from - t2.from);
         int appended = 0;
 
         for (int i = 0; i < tagPositions.size(); i++) {
-            TagPosition t = tagPositions.get(i);
+            final var t = tagPositions.get(i);
             if ((t.from + appended) >= text.length())
                 break;
 
-            String textToTag = text.substring(0, t.from + appended);
-            String textLeft = text.substring(t.from + appended, text.length());
-            String tagText = "";
+            var textToTag = text.substring(0, t.from + appended);
+            var textLeft = text.substring(t.from + appended, text.length());
+            var tagText = "";
             if (t.type == TagType.ITALIC) {
                 tagText = "<i>";
             } else if (t.type == TagType.BOLD) {
@@ -52,7 +51,7 @@ public class TagsInserter {
             text = textToTag + tagText + textLeft;
 
             for (int j = i + 1; j < tagPositions.size(); j++) {
-                TagPosition tt = tagPositions.get(j);
+                final var tt = tagPositions.get(j);
                 if (tt.to < t.from)
                     continue;
                 if (tt.from >= t.to)

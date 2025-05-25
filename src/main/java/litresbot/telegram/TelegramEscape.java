@@ -5,7 +5,7 @@ public class TelegramEscape {
         if (text == null)
             return null;
 
-        String escapedText = text.replace("<", "&lt;").replace("&", "&amp;").replace(">", "&gt;").replace("\"",
+        final var escapedText = text.replace("<", "&lt;").replace("&", "&amp;").replace(">", "&gt;").replace("\"",
                 "&quot;");
         return escapedText;
     }

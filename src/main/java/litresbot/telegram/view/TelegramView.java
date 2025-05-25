@@ -6,6 +6,9 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import litresbot.Application;
+import litresbot.books.BookInfo;
+import litresbot.books.plurals.PluralsTextEn;
+import litresbot.books.plurals.PluralsTextRu;
 import litresbot.localisation.UserMessagesEn;
 import litresbot.telegram.SendMessageList;
 
@@ -22,24 +25,15 @@ public class TelegramView {
     }
 
     public static SendMessageList bookInfoNotFound() {
-        SendMessageList result = new SendMessageList(4096);
-        result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.errorSearchNotFound));
-        result.endTextPage();
-        return result;
+        return SendMessageList.fromText(Application.userMessages.get(UserMessagesEn.errorSearchNotFound));
     }
 
     public static SendMessageList bookCouldNotDownload() {
-        SendMessageList result = new SendMessageList(4096);
-        result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.errorCouldNotDownloadFile));
-        result.endTextPage();
-        return result;
+        return SendMessageList.fromText(Application.userMessages.get(UserMessagesEn.errorCouldNotDownloadFile));
     }
 
     public static SendMessageList searchInProgress() {
-        SendMessageList result = new SendMessageList(4096);
-        result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.searchInProgress));
-        result.endTextPage();
-        return result;
+        return SendMessageList.fromText(Application.userMessages.get(UserMessagesEn.searchInProgress));
     }
 
     /*public static SendMessageList bookChooseFormat(BookInfo book) {
@@ -123,56 +117,53 @@ public class TelegramView {
     }*/
 
     public static SendMessageList downloadInProgress() {
-        SendMessageList result = new SendMessageList(4096);
-        result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.downloadInProgress));
-        result.endTextPage();
-        return result;
+        return SendMessageList.fromText(Application.userMessages.get(UserMessagesEn.downloadInProgress));
     }
 
     public static SendMessageList downloadFinished() {
-        SendMessageList result = new SendMessageList(4096);
-        result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.downloadFinished));
-        result.endTextPage();
-        return result;
+        return SendMessageList.fromText(Application.userMessages.get(UserMessagesEn.downloadFinished));
     }
 
-    /*public static SendMessageList bookSearchResult(List<BookInfo> books, int searchId, int from, int found,
-            String next) {
-        SendMessageList result = new SendMessageList(4096);
+    public static SendMessageList bookSearchResult(List<BookInfo> books, int from, int to, String next) {
+        var result = new SendMessageList(4096);
 
         // generate the search result header - how much books found
         if (from == 0) {
-            String bookText = litresbot.Application.userMessages.get(UserMessagesEn.bookText);
-            String booksText = PluralsTextEn.convert(bookText, found);
+            final var bookText = litresbot.Application.userMessages.get(UserMessagesEn.bookText);
+            var booksText = PluralsTextEn.convert(bookText, books.size());
 
             if (litresbot.Application.userMessages.language().contentEquals("ru")) {
-                booksText = PluralsTextRu.convert(bookText, found);
+                booksText = PluralsTextRu.convert(bookText, books.size());
             }
 
             result.appendTextPage(
                     litresbot.Application.userMessages.get(UserMessagesEn.searchFoundTotal) +
-                            found + " " + booksText + "\n\n");
+                            books.size() + " " + booksText + "\n\n");
             result.endTextPage();
         }
 
         // generate the search result body
+        for (var bookNumber = from; bookNumber < to; bookNumber++) {
+            final var book = books.get(bookNumber);
 
-        int bookNumber = from;
-        for (BookInfo book : books) {
-            bookNumber++;
+            if (book.titles.size() == 0) {
+                continue;
+            }
 
+            // only first title appears in the book search result
             result.appendTextPage("<b>");
-            result.appendTextPage("" + bookNumber + ". " + book.title);
+            result.appendTextPage("" + (bookNumber + 1) + ". " + book.titles.get(0));
             result.appendTextPage("</b>\n");
 
-            if (book.author != null) {
+            // only first author appears in the book search result
+            if (book.authors.size() > 0) {
                 result.appendTextPage(" (");
-                result.appendTextPage(book.author);
+                result.appendTextPage(book.authors.get(0));
                 result.appendTextPage(")\n");
             }
 
             result.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.searchGoto));
-            result.appendTextPage("/b_" + book.id);
+            result.appendTextPage("/b_" + (bookNumber + 1));
 
             result.appendTextPage("\n\n");
             result.endTextPage();
@@ -180,9 +171,9 @@ public class TelegramView {
 
         // generate the book search next buttons
 
-        List<InlineKeyboardButton> buttonsRow = new ArrayList<InlineKeyboardButton>();
+        final var buttonsRow = new ArrayList<InlineKeyboardButton>();
 
-        InlineKeyboardButton btn = new InlineKeyboardButton();
+        final var btn = new InlineKeyboardButton();
         btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.endText));
         btn.setCallbackData("/");
         if (next != null) {
@@ -191,14 +182,13 @@ public class TelegramView {
         }
         buttonsRow.add(btn);
 
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<List<InlineKeyboardButton>>();
+        final var buttons = new ArrayList<List<InlineKeyboardButton>>();
         buttons.add(buttonsRow);
         result.appendButtons(buttons);
         return result;
-    }*/
+    }
 
-    public static SendMessageList readBookSection(SendMessageList output, String line, String next, int pageCount,
-            int pageNumber) {
+    public static SendMessageList readBookSection(SendMessageList output, String line, String next, int pageCount, int pageNumber) {
         output.appendTextPage(line + "\n\n");
         output.appendTextPage("------------------\n");
         output.appendTextPage(litresbot.Application.userMessages.get(UserMessagesEn.pageNumberText) + pageNumber + " / "
@@ -207,9 +197,9 @@ public class TelegramView {
 
         // generate the book next page
 
-        List<InlineKeyboardButton> buttonsRow = new ArrayList<InlineKeyboardButton>();
+        final var buttonsRow = new ArrayList<InlineKeyboardButton>();
 
-        InlineKeyboardButton btn = new InlineKeyboardButton();
+        final var btn = new InlineKeyboardButton();
         btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.endText));
         btn.setCallbackData("/");
         if (next != null) {
@@ -218,7 +208,7 @@ public class TelegramView {
         }
         buttonsRow.add(btn);
 
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<List<InlineKeyboardButton>>();
+        final var buttons = new ArrayList<List<InlineKeyboardButton>>();
         buttons.add(buttonsRow);
         output.appendButtons(buttons);
 
