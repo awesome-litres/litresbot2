@@ -1,6 +1,5 @@
 package litresbot.telegram.commands;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.telegram.TelegramBot;
@@ -20,7 +19,7 @@ public class HelpCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, Message message) throws TelegramApiException {
+    public void execute(Long chatId, String _message) throws TelegramApiException {
         bot.sendReply(chatId, TelegramView.helpScreen());
     }
 }

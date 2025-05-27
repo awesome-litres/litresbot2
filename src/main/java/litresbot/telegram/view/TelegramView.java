@@ -176,7 +176,7 @@ public class TelegramView {
         final var btn = new InlineKeyboardButton();
         btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.endText));
         btn.setCallbackData("/");
-        if (next != null) {
+        if (next != null && !next.isEmpty() && !next.equals("/")) {
             btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.nextText));
             btn.setCallbackData(next);
         }

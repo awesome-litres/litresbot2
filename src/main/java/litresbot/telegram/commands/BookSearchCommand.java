@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.Application;
@@ -14,17 +13,20 @@ import litresbot.SearchBook;
 import litresbot.books.BookInfo;
 import litresbot.localisation.UserMessagesEn;
 import litresbot.telegram.TelegramBot;
+import litresbot.telegram.TelegramBotState;
 import litresbot.telegram.view.TelegramView;
 
 public class BookSearchCommand implements TelegramCommandInterface {
     final static Logger logger = LogManager.getLogger(BookSearchCommand.class);
     public static final String command = "/book";
     protected final TelegramBot bot;
+    protected final TelegramBotState botState;
 
     public static int searchPageSize = 10;
 
-    BookSearchCommand(TelegramBot bot) {
+    BookSearchCommand(TelegramBot bot, TelegramBotState botState) {
         this.bot = bot;
+        this.botState = botState;
     }
 
     @Override
@@ -33,13 +35,12 @@ public class BookSearchCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, Message message) throws TelegramApiException {
-        final var cmd = message.getText().toLowerCase();
+    public void execute(Long chatId, String message) throws TelegramApiException {
         // take the rest of the command as an argument since it may contain spaces
-        String argument = cmd;
-        if (cmd.startsWith(command)) {
+        String argument = message;
+        if (message.startsWith(command)) {
             // remove the command and trailing space from the string
-            argument = cmd.substring(command.length() + 1);
+            argument = message.substring(command.length() + 1);
         }
         bookSearch(chatId, argument);
     }
@@ -54,6 +55,7 @@ public class BookSearchCommand implements TelegramCommandInterface {
             bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorUnknown));
             return;
         }
+        botState.newSearch(chatId, searchQuery, books);
         var nextPage = "/";
         var booksSearchTo = books.size();
         if (booksSearchTo > searchPageSize) {
