@@ -1,5 +1,7 @@
 package litresbot;
 
+import java.sql.SQLException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -10,6 +12,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import litresbot.localisation.UserMessages;
 import litresbot.localisation.UserMessagesRu;
 import litresbot.telegram.TelegramBot;
+import litresbot.telegram.TelegramBotState;
 import litresbot.telegram.commands.TelegramBotCommands;
 
 public class Application {
@@ -80,9 +83,24 @@ public class Application {
         }
 
         try {
+            litresbot.search_db.Database.create();
+        } catch (SQLException e) {
+            logger.error("Could not connect to books database", e);
+            return;
+        }
+
+        final TelegramBotState botState;
+        try {
+            botState = new TelegramBotState();
+        } catch (SQLException e) {
+            logger.error("Could not restore Telegram state", e);
+            return;
+        }
+
+        try {
             final var telegram = new TelegramBotsApi(DefaultBotSession.class);
             final var bot = new TelegramBot(botOptions, botToken);
-            bot.registerCommands(new TelegramBotCommands(bot));
+            bot.registerCommands(new TelegramBotCommands(bot, botState));
             telegram.registerBot(bot);
             logger.info("Bot successfully registered");
         } catch (TelegramApiException e) {

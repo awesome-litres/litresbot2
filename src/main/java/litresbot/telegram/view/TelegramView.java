@@ -169,10 +169,12 @@ public class TelegramView {
             result.endTextPage();
         }
 
+        // if there are no search pages, don't show navigation buttons
+        if (from == 0 && (next.isEmpty() || next.equals("/"))) {
+            return result;
+        }
+
         // generate the book search next buttons
-
-        final var buttonsRow = new ArrayList<InlineKeyboardButton>();
-
         final var btn = new InlineKeyboardButton();
         btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.endText));
         btn.setCallbackData("/");
@@ -180,8 +182,8 @@ public class TelegramView {
             btn.setText(litresbot.Application.userMessages.get(UserMessagesEn.nextText));
             btn.setCallbackData(next);
         }
+        final var buttonsRow = new ArrayList<InlineKeyboardButton>();
         buttonsRow.add(btn);
-
         final var buttons = new ArrayList<List<InlineKeyboardButton>>();
         buttons.add(buttonsRow);
         result.appendButtons(buttons);

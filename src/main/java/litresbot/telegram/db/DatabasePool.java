@@ -1,4 +1,4 @@
-package litresbot.search_db;
+package litresbot.telegram.db;
 
 import javax.sql.DataSource;
 

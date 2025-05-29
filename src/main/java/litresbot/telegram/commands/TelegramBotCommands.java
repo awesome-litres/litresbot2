@@ -20,10 +20,11 @@ public class TelegramBotCommands {
 
     protected final TelegramBot bot;
     protected final List<TelegramCommandInterface> commands = new ArrayList<>();
-    protected final TelegramBotState botState = new TelegramBotState();
+    protected final TelegramBotState botState;
 
-    public TelegramBotCommands(TelegramBot bot) {
+    public TelegramBotCommands(TelegramBot bot, TelegramBotState botState) {
         this.bot = bot;
+        this.botState = botState;
         commands.add(new HelpCommand(bot));
         commands.add(new StartCommand(bot));
         commands.add(new BookSearchCommand(bot, botState));

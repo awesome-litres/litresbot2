@@ -55,14 +55,22 @@ public class BookSearchCommand implements TelegramCommandInterface {
             bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorUnknown));
             return;
         }
-        botState.newSearch(chatId, searchQuery, books);
+        if (books.isEmpty()) {
+            bot.sendReply(chatId, TelegramView.bookInfoNotFound());
+            return;
+        }
+        try {
+            botState.newSearch(chatId, searchQuery, books);
+        } catch (SQLException e) {
+            logger.warn("Could not save search query to the bot state: " + e.getMessage(), e);
+        }
         var nextPage = "/";
         var booksSearchTo = books.size();
         if (booksSearchTo > searchPageSize) {
             booksSearchTo = searchPageSize;
             nextPage = "/next " + booksSearchTo;
         }
-        
+
         final var reply = TelegramView.bookSearchResult(books, 0, booksSearchTo, nextPage);
         bot.sendReply(chatId, reply);
     }
