@@ -11,6 +11,7 @@ public class UserMessagesEn implements UserMessages {
     public static final String errorCouldNotDownloadFile = "Could not download file";
     public static final String errorBadCommand = "Bad command";
     public static final String errorSearchNotFound = "Nothing found";
+    public static final String errorUnknownRetry = "Unknown error... Try searching again";
     public static final String searchInProgress = "Searching book... Please wait";
     public static final String searchFoundTotal = "Found: ";
     public static final String bookText = "book";

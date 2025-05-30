@@ -9,9 +9,10 @@ import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.Application;
-import litresbot.SearchBook;
 import litresbot.books.BookInfo;
+import litresbot.books.BookInfoFiltered;
 import litresbot.localisation.UserMessagesEn;
+import litresbot.search.SearchBook;
 import litresbot.telegram.TelegramBot;
 import litresbot.telegram.TelegramBotState;
 import litresbot.telegram.view.TelegramView;
@@ -71,7 +72,12 @@ public class BookSearchCommand implements TelegramCommandInterface {
             nextPage = "/next " + booksSearchTo;
         }
 
-        final var reply = TelegramView.bookSearchResult(books, 0, booksSearchTo, nextPage);
+        final var filteredBooks = books.stream().map(book -> {
+            // Filter book info to reduce size of the message
+            return new BookInfoFiltered(book);
+        }).toList();
+
+        final var reply = TelegramView.bookSearchResult(filteredBooks, 0, booksSearchTo, nextPage);
         bot.sendReply(chatId, reply);
     }
 }

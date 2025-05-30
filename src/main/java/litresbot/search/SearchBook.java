@@ -1,4 +1,4 @@
-package litresbot;
+package litresbot.search;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 
 import litresbot.books.BookInfo;
-import litresbot.search_db.SearchFlibustaDatabaseBook;
+import litresbot.search.db.SearchFlibustaDatabaseBook;
 
 import org.apache.logging.log4j.LogManager;
 

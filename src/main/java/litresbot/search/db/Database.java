@@ -1,4 +1,4 @@
-package litresbot.search_db;
+package litresbot.search.db;
 
 import java.sql.SQLException;
 
@@ -6,6 +6,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import litresbot.database.DatabasePool;
 
 public class Database {
     final static Logger logger = LogManager.getLogger(Database.class);

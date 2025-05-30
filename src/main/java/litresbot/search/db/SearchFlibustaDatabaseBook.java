@@ -1,4 +1,4 @@
-package litresbot.search_db;
+package litresbot.search.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import litresbot.books.BookFileInfo;
 import litresbot.books.BookInfo;
+import litresbot.database.DatabasePool;
 import litresbot.utils.StringUtils;
 
 import org.apache.logging.log4j.LogManager;

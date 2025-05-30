@@ -7,6 +7,8 @@ import javax.sql.DataSource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import litresbot.database.DatabasePool;
+
 public class Database {
     final static Logger logger = LogManager.getLogger(Database.class);
 
@@ -47,7 +49,7 @@ public class Database {
         return new Database();
     }
 
-    public String getSearchQuery(Long chatId) throws SQLException {
+    /*public String getSearchQuery(Long chatId) throws SQLException {
         final var connection = db.getConnection();
         final var sql = "SELECT query FROM telegram.searches WHERE chatId = ?";
         final var preparedStatement = connection.prepareStatement(sql);
@@ -68,5 +70,5 @@ public class Database {
         preparedStatement.setString(2, query);
         preparedStatement.setString(3, query);
         preparedStatement.executeUpdate();
-    }
+    }*/
 }

@@ -1,4 +1,4 @@
-package litresbot.search_db;
+package litresbot.search.db;
 
 import java.util.List;
 

@@ -29,6 +29,7 @@ public class TelegramBotCommands {
         commands.add(new StartCommand(bot));
         commands.add(new BookSearchCommand(bot, botState));
         commands.add(new BookSearchNextCommand(bot, botState));
+        commands.add(new BookInfoCommand(bot, botState));
     }
 
     public void commandReceived(Update update) throws TelegramApiException {
@@ -69,7 +70,15 @@ public class TelegramBotCommands {
         for (final var command : commands) {
             if (command.isCommand(cmd)) {
                 bot.sendBusy(chatId);
-                command.execute(chatId, cmd);
+                try {
+                    command.execute(chatId, cmd);
+                } catch (NumberFormatException _e) {
+                    bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorBadCommand));
+                } catch (IndexOutOfBoundsException _e) {
+                    bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorBadCommand));
+                } catch (Exception e) {
+                    logger.error("Error executing command: " + e.getMessage(), e);
+                }
                 return;
             }
         }

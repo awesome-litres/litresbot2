@@ -16,6 +16,7 @@ public class UserMessagesRu implements UserMessages {
         translation.put(UserMessagesEn.errorCouldNotDownloadFile, "Не получилось загрузить файл");
         translation.put(UserMessagesEn.errorBadCommand, "Неверная команда");
         translation.put(UserMessagesEn.errorSearchNotFound, "Ничего не найдено");
+        translation.put(UserMessagesEn.errorUnknownRetry, "Неизвестная ошибка... Попробуйте поискать ещё раз");
         translation.put(UserMessagesEn.searchInProgress, "Поиск книги...");
         translation.put(UserMessagesEn.searchFoundTotal, "Найдено: ");
         translation.put(UserMessagesEn.bookText, "книга");

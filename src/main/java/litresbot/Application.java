@@ -83,7 +83,7 @@ public class Application {
         }
 
         try {
-            litresbot.search_db.Database.create();
+            litresbot.search.db.Database.create();
         } catch (SQLException e) {
             logger.error("Could not connect to books database", e);
             return;
