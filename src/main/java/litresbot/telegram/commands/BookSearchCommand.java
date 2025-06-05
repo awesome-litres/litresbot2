@@ -15,7 +15,8 @@ import litresbot.localisation.UserMessagesEn;
 import litresbot.search.SearchBook;
 import litresbot.telegram.TelegramBot;
 import litresbot.telegram.TelegramBotState;
-import litresbot.telegram.view.TelegramView;
+import litresbot.telegram.view.BookSearchResult;
+import litresbot.telegram.view.ProgressMessages;
 
 public class BookSearchCommand implements TelegramCommandInterface {
     final static Logger logger = LogManager.getLogger(BookSearchCommand.class);
@@ -36,7 +37,7 @@ public class BookSearchCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, String message) throws TelegramApiException {
+    public void execute(long chatId, String message) throws TelegramApiException {
         // take the rest of the command as an argument since it may contain spaces
         String argument = message;
         if (message.startsWith(command)) {
@@ -46,8 +47,8 @@ public class BookSearchCommand implements TelegramCommandInterface {
         bookSearch(chatId, argument);
     }
 
-    protected void bookSearch(Long chatId, String searchQuery) throws TelegramApiException {
-        bot.sendReply(chatId, TelegramView.searchInProgress());
+    protected void bookSearch(long chatId, String searchQuery) throws TelegramApiException {
+        bot.sendReply(chatId, ProgressMessages.searchInProgress());
         List<BookInfo> books = new ArrayList<>();
         try {
             books = SearchBook.search(searchQuery);
@@ -57,7 +58,7 @@ public class BookSearchCommand implements TelegramCommandInterface {
             return;
         }
         if (books.isEmpty()) {
-            bot.sendReply(chatId, TelegramView.bookInfoNotFound());
+            bot.sendReply(chatId, ProgressMessages.bookInfoNotFound());
             return;
         }
         try {
@@ -77,7 +78,7 @@ public class BookSearchCommand implements TelegramCommandInterface {
             return new BookInfoFiltered(book);
         }).toList();
 
-        final var reply = TelegramView.bookSearchResult(filteredBooks, 0, booksSearchTo, nextPage);
+        final var reply = BookSearchResult.show(filteredBooks, 0, booksSearchTo, nextPage);
         bot.sendReply(chatId, reply);
     }
 }

@@ -7,5 +7,5 @@ public interface TelegramCommandInterface {
     Boolean isCommand(String cmd);
 
     // executes the command
-    void execute(Long chatId, String command) throws TelegramApiException;
+    void execute(long chatId, String command) throws TelegramApiException;
 }

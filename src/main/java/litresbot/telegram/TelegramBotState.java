@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import litresbot.books.BookInfo;
 //import litresbot.telegram.db.Database;
@@ -31,5 +32,17 @@ public class TelegramBotState {
             return searchState.get(chatId);
         }
         return new ArrayList<>();
+    }
+
+    public Optional<BookInfo> getBookInfo(long chatId, long bookId) {
+        if (!searchState.containsKey(chatId)) {
+            return Optional.empty();
+        }
+
+        final var books = searchState.get(chatId);
+        if (bookId == 0 || bookId > books.size()) {
+            return Optional.empty();
+        }
+        return Optional.of(books.get((int) bookId - 1)); // bookId is 1-based
     }
 }

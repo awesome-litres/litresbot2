@@ -7,7 +7,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import litresbot.books.BookInfoFiltered;
 import litresbot.telegram.TelegramBot;
 import litresbot.telegram.TelegramBotState;
-import litresbot.telegram.view.TelegramView;
+import litresbot.telegram.view.ChooseBookAction;
+import litresbot.telegram.view.ProgressMessages;
 
 public class BookInfoCommand implements TelegramCommandInterface {
     final static Logger logger = LogManager.getLogger(BookInfoCommand.class);
@@ -27,7 +28,7 @@ public class BookInfoCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, String message) throws TelegramApiException {
+    public void execute(long chatId, String message) throws TelegramApiException {
         var argument = "";
         if (message.startsWith(command)) {
             // remove the command and trailing space from the string
@@ -40,25 +41,14 @@ public class BookInfoCommand implements TelegramCommandInterface {
         bookInfo(chatId, bookId);
     }
 
-    protected void bookInfo(Long chatId, Long bookId) throws TelegramApiException {
-        final var books = botState.getSearchResults(chatId);
-        if (books.isEmpty()) {
-            final var reply = TelegramView.retrySearch();
+    protected void bookInfo(long chatId, long bookId) throws TelegramApiException {
+        final var maybeBookInfo = botState.getBookInfo(chatId, bookId);
+        if (maybeBookInfo.isEmpty()) {
+            final var reply = ProgressMessages.retrySearch();
             bot.sendReply(chatId, reply);
             return;
         }
-        if (bookId <= 0) {
-            final var reply = TelegramView.bookInfoNotFound();
-            bot.sendReply(chatId, reply);
-            return;
-        }
-        bookId--; // convert to zero-based index
-        if (bookId >= books.size()) {
-            final var reply = TelegramView.bookInfoNotFound();
-            bot.sendReply(chatId, reply);
-            return;
-        }
-        final var bookInfo = books.get(bookId.intValue());
+        final var bookInfo = maybeBookInfo.get();
 
         var hasFb2Format = false;
         for(final var f: bookInfo.files) {
@@ -69,7 +59,7 @@ public class BookInfoCommand implements TelegramCommandInterface {
         }
 
         final var bookInfoFiltered = new BookInfoFiltered(bookInfo);
-        final var reply = TelegramView.bookChooseAction(bookInfoFiltered, bookId, hasFb2Format);
+        final var reply = ChooseBookAction.show(bookInfoFiltered, bookId, hasFb2Format);
         bot.sendReply(chatId, reply);
     }
 }

@@ -3,7 +3,6 @@ package litresbot.telegram.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -30,6 +29,7 @@ public class TelegramBotCommands {
         commands.add(new BookSearchCommand(bot, botState));
         commands.add(new BookSearchNextCommand(bot, botState));
         commands.add(new BookInfoCommand(bot, botState));
+        commands.add(new BookFormatCommand(bot, botState));
     }
 
     public void commandReceived(Update update) throws TelegramApiException {
@@ -63,8 +63,10 @@ public class TelegramBotCommands {
             return;
         }
 
-        logger.info("Command received from {}: {}", StringEscapeUtils.escapeJava(userName), StringEscapeUtils.escapeJava(cmd));
-        logger.info("User has language: {}", StringEscapeUtils.escapeJava(languageCode));
+        // String escaping is not used because log4shell attack is prevented by
+        // recent log4j versions and message lookups are disabled in configuration
+        logger.info("Command received from {}: {}", userName, cmd);
+        logger.info("User has language: {}", languageCode);
         cmd = cmd.toLowerCase();
 
         for (final var command : commands) {

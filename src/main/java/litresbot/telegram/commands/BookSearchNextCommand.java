@@ -7,7 +7,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import litresbot.books.BookInfoFiltered;
 import litresbot.telegram.TelegramBot;
 import litresbot.telegram.TelegramBotState;
-import litresbot.telegram.view.TelegramView;
+import litresbot.telegram.view.BookSearchResult;
+import litresbot.telegram.view.ProgressMessages;
 
 public class BookSearchNextCommand implements TelegramCommandInterface {
     final static Logger logger = LogManager.getLogger(BookSearchNextCommand.class);
@@ -26,16 +27,16 @@ public class BookSearchNextCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, String message) throws TelegramApiException {
+    public void execute(long chatId, String message) throws TelegramApiException {
         final var argument = message.substring(command.length() + 1);
         final var fromBook = Integer.parseInt(argument);
         bookSearchNext(chatId, fromBook);
     }
 
-    protected void bookSearchNext(Long chatId, int fromBook) throws TelegramApiException {
+    protected void bookSearchNext(long chatId, int fromBook) throws TelegramApiException {
         var books = botState.getSearchResults(chatId);
         if (books.isEmpty()) {
-            final var reply = TelegramView.retrySearch();
+            final var reply = ProgressMessages.retrySearch();
             bot.sendReply(chatId, reply);
             return;
         }
@@ -48,12 +49,12 @@ public class BookSearchNextCommand implements TelegramCommandInterface {
         if (booksSearchTo < fromBook) {
             booksSearchTo = fromBook;
         }
+         // Filter books for XSS protection
         final var filteredBooks = books.stream().map(book -> {
-            // Filter book info to reduce size of the message
             return new BookInfoFiltered(book);
         }).toList();
 
-        final var reply = TelegramView.bookSearchResult(filteredBooks, fromBook, booksSearchTo, nextPage);
+        final var reply = BookSearchResult.show(filteredBooks, fromBook, booksSearchTo, nextPage);
         bot.sendReply(chatId, reply);
     }
 }

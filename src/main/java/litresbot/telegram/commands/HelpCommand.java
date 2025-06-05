@@ -3,7 +3,7 @@ package litresbot.telegram.commands;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.telegram.TelegramBot;
-import litresbot.telegram.view.TelegramView;
+import litresbot.telegram.view.HelpScreen;
 
 public class HelpCommand implements TelegramCommandInterface {
     public static final String command = "/help";
@@ -19,7 +19,7 @@ public class HelpCommand implements TelegramCommandInterface {
     }
 
     @Override
-    public void execute(Long chatId, String _message) throws TelegramApiException {
-        bot.sendReply(chatId, TelegramView.helpScreen());
+    public void execute(long chatId, String _message) throws TelegramApiException {
+        bot.sendReply(chatId, HelpScreen.show());
     }
 }
