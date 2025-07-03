@@ -30,4 +30,4 @@ litresbot.properties
 litresbot.jar
 commit.bat
 run.bat
-download/
+./download/
