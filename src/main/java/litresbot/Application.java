@@ -9,6 +9,9 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import litresbot.books.BookDownloader;
+import litresbot.download.FlibustaS3BookDownloader;
+import litresbot.download.S3BookClient;
 import litresbot.localisation.UserMessages;
 import litresbot.localisation.UserMessagesRu;
 import litresbot.telegram.TelegramBot;
@@ -97,10 +100,14 @@ public class Application {
             return;
         }
 
+        final var s3Client = new S3BookClient("https://play.min.io", "Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG", "", "test", "upload");
+        final var s3Downloader = new FlibustaS3BookDownloader(s3Client, flibustaDownloadPath);
+        final var bookDownloader = new BookDownloader(s3Downloader);
+
         try {
             final var telegram = new TelegramBotsApi(DefaultBotSession.class);
             final var bot = new TelegramBot(botOptions, botToken);
-            bot.registerCommands(new TelegramBotCommands(bot, botState));
+            bot.registerCommands(new TelegramBotCommands(bot, botState, bookDownloader));
             telegram.registerBot(bot);
             logger.info("Bot successfully registered");
         } catch (TelegramApiException e) {

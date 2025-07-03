@@ -10,9 +10,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import litresbot.Application;
+import litresbot.books.BookDownloader;
 import litresbot.localisation.UserMessagesEn;
 import litresbot.telegram.TelegramBot;
 import litresbot.telegram.TelegramBotState;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 public class TelegramBotCommands {
     final static Logger logger = LogManager.getLogger(TelegramBotCommands.class);
@@ -20,16 +22,19 @@ public class TelegramBotCommands {
     protected final TelegramBot bot;
     protected final List<TelegramCommandInterface> commands = new ArrayList<>();
     protected final TelegramBotState botState;
+    protected final BookDownloader downloader;
 
-    public TelegramBotCommands(TelegramBot bot, TelegramBotState botState) {
+    public TelegramBotCommands(TelegramBot bot, TelegramBotState botState, BookDownloader downloader) {
         this.bot = bot;
         this.botState = botState;
+        this.downloader = downloader;
         commands.add(new HelpCommand(bot));
         commands.add(new StartCommand(bot));
         commands.add(new BookSearchCommand(bot, botState));
         commands.add(new BookSearchNextCommand(bot, botState));
         commands.add(new BookInfoCommand(bot, botState));
         commands.add(new BookFormatCommand(bot, botState));
+        commands.add(new BookDownloadCommand(bot, botState, downloader));
     }
 
     public void commandReceived(Update update) throws TelegramApiException {
@@ -77,6 +82,8 @@ public class TelegramBotCommands {
                 } catch (NumberFormatException _e) {
                     bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorBadCommand));
                 } catch (IndexOutOfBoundsException _e) {
+                    bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorBadCommand));
+                } catch (NoSuchKeyException _e) {
                     bot.sendReply(chatId, Application.userMessages.get(UserMessagesEn.errorBadCommand));
                 } catch (Exception e) {
                     logger.error("Error executing command: " + e.getMessage(), e);
